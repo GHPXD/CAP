@@ -8,14 +8,15 @@ import os
 import shutil
 import datetime
 
-
 def move_downloaded_files(download_start_time):
     # Caminho das pastas de origem e destino
     user_name = os.getlogin()
     source_folder = f"C:/Users/{user_name}/Downloads/"
-    destination_folder = f"C:/Users/{user_name}/Votorantim/Financeiro - SUPRIMENTOS/02. SUP 02 GESTÃO DE LANÇAMENTO DE NOTAS FISCAIS/FOLHA DE SERVIÇO/Anexos SAP/TESTE/"
     
-    # Criação da pasta de destino caso não exista
+    # Caminho da pasta "teste" dentro de Documentos
+    destination_folder = f"C:/Users/{user_name}/Documents/teste"
+    
+    # Criação da pasta de destino "teste" caso não exista
     if not os.path.exists(destination_folder):
         os.makedirs(destination_folder)
 
@@ -31,14 +32,13 @@ def move_downloaded_files(download_start_time):
 
     print("Arquivos movidos com sucesso!")
 
-
 def download_cap():
     # Configurações do Selenium WebDriver
     options = Options()
     options.add_argument("--start-maximized")
     
     # Caminho do chromedriver (substitua com o caminho correto do seu chromedriver)
-    service = Service("path/to/chromedriver")
+    service = Service("C:/Users/guilhermehp/OneDrive - Votorantim/Área de Trabalho/CAP-main/chromedriver.exe")
     driver = webdriver.Chrome(service=service, options=options)
     
     # Aumenta o tempo de espera para garantir que a página seja carregada corretamente
@@ -55,7 +55,7 @@ def download_cap():
     time.sleep(3)
 
     # Insere o email de login
-    driver.find_element(By.XPATH, "/html/body/div/form[1]/div/div/div[2]/div[1]/div/div/div/div/div[1]/div[3]/div/div/div/div[2]/div[2]/div/input[1]").send_keys("joao.souza.js1@votorantim.com")
+    driver.find_element(By.XPATH, "/html/body/div/form[1]/div/div/div[2]/div[1]/div/div/div/div/div[1]/div[3]/div/div/div/div[2]/div[2]/div/input[1]").send_keys("email@email.com")
     driver.find_element(By.XPATH, "/html/body/div/form[1]/div/div/div[2]/div[1]/div/div/div/div/div[1]/div[3]/div/div/div/div[4]/div/div/div/div/input").click()
 
     # Tratamento de erro de senha
@@ -123,7 +123,6 @@ def download_cap():
 
     # Fecha o navegador
     driver.quit()
-
 
 if __name__ == "__main__":
     download_cap()
