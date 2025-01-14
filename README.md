@@ -9,7 +9,7 @@
    │
    ├── assets/                           # Imagens e arquivos auxiliares
    │   └── logo.png                      # Imagem de logo para interface
-   |   └── CAP.xlsx                      # Imagem de logo para interface
+   |   └── CAP.xlsx                      # Arquivo excel para processamento de dados
    │
    ├── build/                            # Arquivos gerados após a criação do executável com PyInstaller
    │   └── main/                         # Arquivos temporários criados durante a execução do PyInstaller
