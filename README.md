@@ -110,8 +110,8 @@
 
    - **Coluna 1**: Número da solicitação (deve ser numérico).
    - **Coluna 2**: Fluxo de Trabalho (pode ser texto ou numérico).
-   - **Coluna 14**: Status de Aprovação (Deve ser "Aprovado" para processar).
-   - **Coluna 15**: Data de Aprovação (Deve ser igual a "hoje" ou "ontem").
+   - **Coluna 13**: Status de Aprovação (Deve ser "Aprovado" para processar).
+   - **Coluna 14**: Data de Aprovação (Deve ser igual a "hoje" ou "ontem").
 
    Exemplo de estrutura da planilha:
 
