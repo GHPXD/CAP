@@ -36,10 +36,11 @@ def download_cap():
     # Configurações do Selenium WebDriver
     options = Options()
     options.add_argument("--start-maximized")
+    driver = webdriver.Chrome(options=options)
+
     
     # Caminho do chromedriver (substitua com o caminho correto do seu chromedriver)
     service = Service("C:/Users/guilhermehp/OneDrive - Votorantim/Área de Trabalho/CAP-main/chromedriver.exe")
-    driver = webdriver.Chrome(service=service, options=options)
     
     # Aumenta o tempo de espera para garantir que a página seja carregada corretamente
     driver.implicitly_wait(10)

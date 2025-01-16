@@ -6,53 +6,59 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 import time
 import os
+from tkinter import Tk, filedialog
 
-def get_excel_data(excel_path, sheet_name="Controle CAP"):
-    """Carregar os dados da planilha Excel."""
-    df = pd.read_excel(excel_path, sheet_name=sheet_name)
-    return df
-
-def approve_task(driver, data_hoje, data_ontem, excel_data):
-    """Aprovar as tarefas com base nos dados da planilha."""
-    for index, row in excel_data.iterrows():
-        # Acessar as colunas conforme indicado
-        solicitacao = row['Solicitação']
-        folha_servico = row['FRS']
-        status = row['Status Aprov.']
-        data_aprovacao = row['Data Aprovação']
-        
-        # Validação conforme as condições
-        if status == "Aprovado" and isinstance(solicitacao, (int, float)):
-            # Validar se a data de aprovação é "hoje" ou "ontem"
-            if data_aprovacao == data_hoje or data_aprovacao == data_ontem:
-                print(f"Aprovando tarefa: {solicitacao} - {folha_servico}")
-                
-                try:
-                    # Navegar até a tarefa na página web
-                    driver.find_element(By.XPATH, f"//tr[td[1][contains(text(), '{solicitacao}')]]").click()
-                    time.sleep(2)
-                    
-                    # Realizar a aprovação clicando no botão ou realizando a ação necessária
-                    approve_button = driver.find_element(By.XPATH, "//button[contains(text(), 'Aprovar')]")
-                    approve_button.click()
-                    time.sleep(2)
-                    
-                    print(f"Tarefa {solicitacao} aprovada com sucesso!")
-                except Exception as e:
-                    print(f"Erro ao tentar aprovar a tarefa {solicitacao}: {e}")
-    print("Processo de aprovação concluído!")
+def select_excel_file():
+    """Abrir janela de diálogo para selecionar arquivo Excel."""
+    root = Tk()
+    root.withdraw()  # Esconde a janela principal do Tkinter
+    
+    file_path = filedialog.askopenfilename(
+        title='Selecione o arquivo Excel',
+        filetypes=[('Excel Files', '*.xlsx')],
+        initialdir=os.getcwd()
+    )
+    
+    return file_path if file_path else None
 
 def setup_driver():
     """Configurar o WebDriver do Selenium."""
     options = Options()
     options.add_argument("--start-maximized")
     
-    chromedriver_path = os.getenv('CHROMEDRIVER_PATH', "path/to/chromedriver")  # Caminho do chromedriver
+    chromedriver_path = os.getenv('CHROMEDRIVER_PATH', "path/to/chromedriver")
     service = Service(chromedriver_path)
-    driver = webdriver.Chrome(service=service, options=options)
+    driver = webdriver.Chrome(options=options)
     
-    driver.implicitly_wait(10)  # Aguardar o carregamento da página
+    driver.implicitly_wait(10)
     return driver
+
+def get_excel_data(excel_path, sheet_name="Controle CAP"):
+    """Carregar os dados da planilha Excel."""
+    try:
+        df = pd.read_excel(excel_path, sheet_name=sheet_name)
+        
+        # Validar colunas necessárias
+        required_columns = ['Solicitação', 'FRS', 'Status Aprov.', 'Data Aprovação']
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        
+        if missing_columns:
+            raise ValueError(f"Colunas ausentes na planilha: {', '.join(missing_columns)}")
+            
+        # Converter coluna de data para datetime
+        df['Data Aprovação'] = pd.to_datetime(df['Data Aprovação']).dt.date
+        
+        # Converter coluna de solicitação para numérico
+        df['Solicitação'] = pd.to_numeric(df['Solicitação'], errors='coerce')
+        
+        return df
+        
+    except FileNotFoundError:
+        print(f"Arquivo não encontrado: {excel_path}")
+        return None
+    except Exception as e:
+        print(f"Erro ao ler o arquivo Excel: {str(e)}")
+        return None
 
 def login(driver, username, password):
     """Fazer login na plataforma."""
@@ -74,36 +80,73 @@ def login(driver, username, password):
         print(f"Erro no login: {e}")
         driver.quit()
 
-def main(excel_path, username, password):
-    """Função principal para automatizar o processo de aprovação."""
-    # Obter os dados da planilha
-    excel_data = get_excel_data(excel_path)
+def approve_task(driver, data_hoje, data_ontem, excel_data):
+    """Aprovar as tarefas com base nos dados da planilha."""
+    if excel_data is None or excel_data.empty:
+        print("Sem dados para processar")
+        return
+        
+    for index, row in excel_data.iterrows():
+        try:
+            solicitacao = row['Solicitação']
+            folha_servico = row['FRS']
+            status = row['Status Aprov.']
+            data_aprovacao = row['Data Aprovação']
+            
+            if pd.isna(solicitacao) or pd.isna(status) or pd.isna(data_aprovacao):
+                print(f"Linha {index + 2}: Dados incompletos, pulando...")
+                continue
+                
+            if status == "Aprovado" and isinstance(solicitacao, (int, float)):
+                if data_aprovacao == data_hoje or data_aprovacao == data_ontem:
+                    print(f"Aprovando tarefa: {int(solicitacao)} - {folha_servico}")
+                    
+                    try:
+                        driver.find_element(By.XPATH, f"//tr[td[1][contains(text(), '{int(solicitacao)}')]]").click()
+                        time.sleep(2)
+                        
+                        approve_button = driver.find_element(By.XPATH, "//button[contains(text(), 'Aprovar')]")
+                        approve_button.click()
+                        time.sleep(2)
+                        
+                        print(f"Tarefa {int(solicitacao)} aprovada com sucesso!")
+                    except Exception as e:
+                        print(f"Erro ao tentar aprovar a tarefa {int(solicitacao)}: {e}")
+                        
+        except Exception as e:
+            print(f"Erro ao processar linha {index + 2}: {e}")
+            continue
+            
+    print("Processo de aprovação concluído!")
 
-    # Definir as datas de hoje e ontem
+def main(username, password):
+    """Função principal para automatizar o processo de aprovação."""
+    excel_path = select_excel_file()
+    
+    if not excel_path:
+        print("Nenhum arquivo selecionado. Encerrando programa.")
+        return
+        
+    excel_data = get_excel_data(excel_path)
+    if excel_data is None:
+        return
+
     data_hoje = datetime.date.today()
     data_ontem = data_hoje - datetime.timedelta(days=1)
     
-    # Configurar o WebDriver
-    driver = setup_driver()
-    
-    # Login na plataforma
-    login(driver, username, password)
-
-    # Aguardar a página carregar
-    time.sleep(5)
-    
-    # Chamar a função de aprovação das tarefas
-    approve_task(driver, data_hoje, data_ontem, excel_data)
-    
-    # Fechar o driver após a execução
-    driver.quit()
+    try:
+        driver = setup_driver()
+        login(driver, username, password)
+        time.sleep(5)
+        approve_task(driver, data_hoje, data_ontem, excel_data)
+    except Exception as e:
+        print(f"Erro durante a execução: {e}")
+    finally:
+        if 'driver' in locals():
+            driver.quit()
 
 if __name__ == "__main__":
-    # Caminho para o arquivo Excel
-    excel_path = os.path.join(os.getcwd(), "assets", "CAP.xlsx")  # Caminho para o arquivo na pasta assets
-    
-    # Definir o nome de usuário e senha (pode ser carregado de variáveis de ambiente ou outro meio)
     username = "email@email.com"
     password = "your_password"
     
-    main(excel_path, username, password)
+    main(username, password)
