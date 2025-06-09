@@ -1,6 +1,6 @@
 # Automação de Aprovação de Tarefas - Sistema CAP
 
-Este repositório contém scripts Python que automatizam o processo de aprovação de tarefas no sistema CAP (Votorantim). O processo envolve a interação com a planilha Excel para filtrar tarefas, acessar o sistema CAP e aprovar as tarefas automaticamente, seguindo a lógica de um código VBA anterior.
+Este repositório contém scripts Python que automatizam o processo de aprovação de tarefas no sistema CAP (Votorantim). O processo envolve a interação com a planilha Excel para filtrar tarefas, acessar o sistema CAP e aprovar as tarefas automaticamente.
 
 ## Estrutura do Projeto
 
