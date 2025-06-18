@@ -1,141 +1,131 @@
-# Automação de Aprovação de Tarefas - Sistema CAP
+⚙️ Automação de Aprovação de Tarefas - Sistema CAP
 
-Este repositório contém scripts Python que automatizam o processo de aprovação de tarefas no sistema CAP (Votorantim). O processo envolve a interação com a planilha Excel para filtrar tarefas, acessar o sistema CAP e aprovar as tarefas automaticamente.
 
-## Estrutura do Projeto
 
-```
+Automatize tarefas repetitivas no sistema CAP (Votorantim) com este conjunto de scripts Python! A solução interage com a plataforma ServiceNow para baixar e aprovar tarefas de forma eficiente, com suporte a interface gráfica e planilhas Excel.
+
+🚀 Funcionalidades
+✅ Download de Relatórios/Anexos do CAP
+✅ Aprovação Automatizada de Tarefas com base em critérios definidos em planilhas Excel
+✅ Interface Gráfica Intuitiva (Tkinter) para facilitar o uso
+✅ Automação com Selenium e tratamento robusto de interações com a web
+
+📁 Estrutura do Projeto
+bash
+Copy
+Edit
 CAP_Automacao/
 │
-├── assets/                           # Imagens e arquivos auxiliares
-│   └── logo.png                      # Imagem de logo para interface
+├── assets/                  # Imagens e arquivos auxiliares
+│   └── logo.png             # (Opcional) Logo da interface
 │
-├── build/                            # Arquivos gerados após a criação do executável com PyInstaller
-│   └── main/                         # Arquivos temporários criados durante a execução do PyInstaller
+├── src/                     # Scripts principais
+│   ├── aprovacao_cap.py     # Aprova tarefas automaticamente
+│   ├── download_cap.py      # Baixa relatórios/anexos
+│   └── main.py              # Interface gráfica e controle geral
 │
-├── dist/                             # Executáveis gerados com PyInstaller
-│   └── main.exe                      # Executável gerado para Windows
-│
-├── src/                              # Scripts principais
-│   ├── aprovacao_cap.py              # Script de aprovação de CAP
-│   ├── download_cap.py              # Script de download de CAP
-│   ├── main.py                      # Arquivo principal que inicia o processo
-│   ├── utils.py                     # Funções utilitárias, como login e validações
-│
-├── requirements.txt                 # Arquivo de dependências para o Python
-├── main.spec                        # Arquivo de configuração do PyInstaller
-└── README.md                        # Este arquivo de documentação
-```
+├── .gitignore               # Arquivos/pastas ignoradas pelo Git
+├── requirements.txt         # Dependências do projeto
+├── main.spec                # (Opcional) Configuração para PyInstaller
+└── README.md                # Este arquivo
+📋 Pré-requisitos
+🐍 Requisitos de Software
+Python 3.8 ou superior
 
-## Pré-requisitos
+Google Chrome instalado
 
-Antes de executar os scripts, você precisa ter alguns pré-requisitos instalados:
+📦 Bibliotecas Python
+selenium
 
-1. **Python 3.8 ou superior** (certifique-se de que o Python está instalado e configurado corretamente no seu sistema).
-2. **Bibliotecas Python necessárias**:
-    - `selenium`
-    - `pandas`
-    - `tkinter` (incluso por padrão no Python para interfaces gráficas)
+pandas
 
-### Instalando as Bibliotecas
+tkinter (normalmente já incluso com Python)
 
-Para instalar as dependências necessárias, execute:
+webdriver_manager (para facilitar o uso do ChromeDriver)
 
-```bash
+Para instalar todas as dependências:
+
+bash
+Copy
+Edit
 pip install -r requirements.txt
-```
+⚙️ Executando o Projeto
+1️⃣ Usando a Interface Gráfica (Recomendado)
+bash
+Copy
+Edit
+python src/main.py
+A janela interativa permitirá que você escolha entre:
 
-3. **ChromeDriver**: O Selenium precisa de um `ChromeDriver` para interagir com o navegador Chrome. Baixe a versão compatível com a sua versão do Chrome [aqui](https://sites.google.com/a/chromium.org/chromedriver/). Coloque o `chromedriver.exe` na pasta raiz do projeto ou especifique o caminho no código.
+✅ Rodar Download de CAP
 
-## Como Executar
+✅ Rodar Aprovação de CAP
 
-### 1. **Executar via Interface Gráfica**
+2️⃣ Executando Diretamente via Terminal
+Para Download de Relatórios:
 
-O script `main.py` oferece uma interface gráfica simples para escolher qual operação executar: **Download de CAP** ou **Aprovação de CAP**.
+bash
+Copy
+Edit
+python src/download_cap.py
+Para Aprovação de Tarefas:
 
-- Baixe e extraia o projeto em seu computador.
-- Execute o arquivo **`main.exe`** (gerado com PyInstaller) para abrir a interface gráfica.
-- Na interface, escolha qual processo deseja rodar (Download ou Aprovação).
-- Siga as instruções na tela para autenticação e execução do processo.
+bash
+Copy
+Edit
+python src/aprovacao_cap.py
+⚠️ Execute sempre os scripts a partir da raiz do projeto (CAP_Automacao/) para garantir o correto funcionamento dos caminhos relativos.
 
-### 2. **Executar via Linha de Comando**
+🔄 Fluxo de Funcionamento
+🧾 download_cap.py
+Login no sistema CAP (venergia.capworkflow.com)
 
-Caso prefira, você também pode rodar diretamente o código Python via linha de comando, sem a interface gráfica.
+Acesso à aba TAREFAS
 
-#### Executar o **DownloadCAP**:
+Configuração de colunas da tabela
 
-No terminal, navegue até a pasta `src/` e execute o script:
+Iteração nas tarefas e download automático dos arquivos
 
-```bash
-python download_cap.py
-```
+Arquivos movidos para: C:/Users/SeuUsuario/Documents/teste (pasta configurável)
 
-#### Executar o **AprovaçãoCAP**:
+✅ aprovacao_cap.py
+Seleção da planilha Excel (.xlsx) com os dados de controle
 
-Para o processo de aprovação de CAP, execute:
+Leitura e validação das colunas:
 
-```bash
-python aprovacao_cap.py
-```
+Solicitação
 
-## Como Funciona
+FRS
 
-### **1. DownloadCAP**
+Status Aprov. (deve estar como "Aprovado")
 
-O script `download_cap.py` realiza o seguinte fluxo:
+Data Aprovação (hoje ou ontem)
 
-- **Login** no sistema CAP.
-- **Navega** até a página de tarefas.
-- **Filtra e seleciona** colunas específicas.
-- **Baixa arquivos** de tarefas com base em links encontrados na página.
+Aprovação automatizada de cada tarefa válida:
 
-### **2. AprovaçãoCAP**
+Navega na aba TAREFAS
 
-O script `aprovacao_cap.py` automatiza a aprovação de tarefas com base em dados da planilha Excel. Ele executa o seguinte processo:
+Clica na linha da solicitação
 
-1. **Carrega** a planilha de tarefas.
-2. **Verifica** se as tarefas estão aprovadas na coluna de status e se as condições de data são atendidas (tarefa deve ser de hoje ou ontem).
-3. **Acessa** a interface web do CAP e aprova as tarefas.
-4. **Atualiza** a planilha para indicar que a tarefa foi processada.
+Pressiona o botão “Aprovar”
 
-### **Ajustes de Planilha**
+Trata possíveis alertas de confirmação
 
-O script assume que a planilha Excel tem uma estrutura específica. Verifique se as seguintes colunas estão presentes:
+📊 Estrutura Esperada da Planilha Excel
+Solicitação	FRS	...	Status Aprov.	Data Aprovação
+123456	1031234567	...	Aprovado	2024-06-17
+234567	1039876543	...	Aprovado	2024-06-18
+345678	1031928375	...	Pendente	2024-06-16
 
-- **Coluna 1**: Número da tarefa.
-- **Coluna 2**: Fluxo de Trabalho.
-- **Coluna 14**: Status da tarefa (Deve ser "Aprovado" para processar).
-- **Coluna X**: Data relacionada à tarefa (Deve ser igual a "hoje" ou "ontem").
+⚠️ Considerações Importantes
+🔐 Segurança das Credenciais: Evite manter senhas no código. Use variáveis de ambiente ou arquivos .env (ignorados pelo Git).
 
-Exemplo de estrutura da planilha:
+🕵️ Seletores XPATH: Mudanças na interface do site podem afetar o funcionamento. Atualize os seletores conforme necessário.
 
-| Número | Fluxo de Trabalho | ... | Status   | Data       |
-|--------|--------------------|-----|----------|------------|
-| 12345  | WF001              | ... | Aprovado | 12/01/2025 |
-| 67890  | WF002              | ... | Pendente | 13/01/2025 |
+🧪 Tratamento de Erros: O uso de try-except e logging facilita a depuração. Verifique o console ou adicione logs se necessário.
 
-### **Configuração do Selenium**
+🌐 Compatibilidade com Navegador: Projetado para funcionar com Google Chrome.
 
-O Selenium usa o `ChromeDriver` para automatizar o navegador. Se o caminho do `ChromeDriver` não estiver configurado corretamente, o código irá falhar. Para configurá-lo:
-
-1. Baixe a versão do `ChromeDriver` compatível com o seu Chrome.
-2. Coloque o `chromedriver.exe` na pasta raiz do projeto ou ajuste o caminho no código.
-
-```python
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-
-service = Service("path/to/chromedriver")  # Substitua o caminho pelo local do seu ChromeDriver
-driver = webdriver.Chrome(service=service)
-```
-
-### **Variáveis Importantes**
-
-- **`ws.Cells(i, x)`**: Acessa as células da planilha (com base no número da linha `i` e a coluna `x`).
-- **Planilha**: O script assume que você está utilizando o Excel para armazenar as tarefas que precisam ser aprovadas ou baixadas.
-- **Datas**: O script verifica se a data da tarefa é igual a "hoje" ou "ontem" para processá-la.
-
-- ## Licença
-
-Este projeto é licenciado sob a licença MIT - veja o arquivo **LICENSE** para mais detalhes.
+📄 Licença
+Este projeto está licenciado sob a Licença MIT.
+Sinta-se livre para usar, modificar e contribuir!
